@@ -1,0 +1,73 @@
+import React, { useState, useEffect } from 'react';
+import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { getGeminiSummary } from '../services/geminiService';
+import { Financials, AnalysisResults } from '../types';
+
+interface GeminiInsightsProps {
+  financials: Financials;
+  results: AnalysisResults;
+}
+
+export const GeminiInsights: React.FC<GeminiInsightsProps> = ({ financials, results }) => {
+  const [insights, setInsights] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const generateInsights = async () => {
+    setIsLoading(true);
+    try {
+      const summary = await getGeminiSummary(financials, results);
+      setInsights(summary);
+    } catch (error) {
+      setInsights("Unable to generate insights at this time.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-[#161b2b] border border-emerald-500/30 rounded-2xl p-6 shadow-lg relative overflow-hidden group">
+      {/* Background Glow */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-emerald-500/10 transition-all" />
+      
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="p-2 bg-emerald-500/10 rounded-lg">
+            <Sparkles className="w-5 h-5 text-emerald-500" />
+          </div>
+          <h3 className="text-lg font-bold text-white">Gemini Insights</h3>
+        </div>
+        <button
+          onClick={generateInsights}
+          disabled={isLoading}
+          className="text-xs font-bold text-emerald-500 hover:text-emerald-400 transition-colors uppercase tracking-widest flex items-center gap-1"
+        >
+          {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Regenerate'}
+        </button>
+      </div>
+
+      <div className="relative min-h-[100px]">
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+            <Loader2 className="w-8 h-8 animate-spin mb-2" />
+            <p className="text-sm">Analyzing deal potential...</p>
+          </div>
+        ) : insights ? (
+          <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
+            {insights}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-8 text-gray-500 border-2 border-dashed border-gray-800 rounded-xl">
+            <AlertCircle className="w-8 h-8 mb-2 opacity-20" />
+            <p className="text-sm">Click regenerate to get AI analysis</p>
+            <button 
+              onClick={generateInsights}
+              className="mt-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 px-4 py-2 rounded-lg text-xs font-bold transition-all"
+            >
+              Generate Now
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
