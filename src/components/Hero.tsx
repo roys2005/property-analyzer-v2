@@ -1,95 +1,104 @@
+// src/components/Hero.tsx
 import React, { useState } from 'react';
-import { Search, MapPin, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import Autocomplete from 'react-google-autocomplete';
+import { Search, Loader2, MapPin } from 'lucide-react';
 import { fetchRentCastData } from '../services/rentCastService';
-import { Property } from '../types';
+import { useProperty } from '../context/PropertyContext'; // Assuming you have a context to store the selected property
+import { PropertyCard } from './PropertyCard';
 
-interface HeroProps {
-  onResults: (results: Property[]) => void;
-}
-
-export const Hero: React.FC<HeroProps> = ({ onResults }) => {
-  const [query, setQuery] = useState('');
+export const Hero: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [searchedProperty, setSearchedProperty] = useState<any>(null);
+  
+  const navigate = useNavigate();
+  const { setProperty } = useProperty(); // Save data to global state for the ROI page
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddressSelect = async (place: any) => {
+    if (!place || !place.formatted_address) return;
+    
     setIsLoading(true);
+    setError('');
+    setSearchedProperty(null);
+
     try {
-      const results = await fetchRentCastData(query);
-      onResults(results);
-    } catch (error) {
-      console.error(error);
+      // 1. Fetch data from RentCast using the Google formatted address
+      const propertyData = await fetchRentCastData(place.formatted_address);
+      
+      // 2. Display the card locally on the landing page
+      setSearchedProperty(propertyData);
+      
+      // 3. Save to global state so the Dashboard can use it when they click Analyze
+      setProperty(propertyData); 
+      
+    } catch (err: any) {
+      setError(err.message || 'Could not find data for this address.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="relative bg-[#0a0f1d] pt-20 pb-32 overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full" />
-      </div>
+    <div className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        
+        <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight">
+          Find High-Yield <span className="text-emerald-500">Real Estate</span> Deals
+        </h1>
+        
+        <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
+          Enter any US address to instantly analyze cash flow, cap rate, and ROI using real-time market data and AI insights.
+        </p>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center max-w-3xl mx-auto">
-          <h1 className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight mb-6">
-            Analyze Real Estate Deals <br />
-            <span className="text-emerald-500">Like a Pro</span>
-          </h1>
-          <p className="text-xl text-gray-400 mb-10">
-            Instantly fetch market data, calculate ROI, and get AI-powered insights for any property in seconds.
-          </p>
+        {/* Search Box */}
+        <div className="max-w-3xl mx-auto relative group">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+            <Search className="h-6 w-6 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
+          </div>
+          
+          <Autocomplete
+            apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+            onPlaceSelected={handleAddressSelect}
+            options={{
+              types: ['address'],
+              componentRestrictions: { country: 'us' }, // Restrict to US for RentCast
+            }}
+            placeholder="Enter address, city, or zip code..."
+            className="w-full bg-[#161b2b] border-2 border-gray-800 text-white pl-12 pr-4 py-4 rounded-2xl text-lg focus:outline-none focus:border-emerald-500 shadow-2xl transition-all"
+          />
 
-          <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto">
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-                <MapPin className="h-5 w-5 text-gray-500 group-focus-within:text-emerald-500 transition-colors" />
-              </div>
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Enter address, city, or zip code..."
-                className="block w-full pl-14 pr-32 py-5 bg-[#161b2b] border border-gray-800 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all shadow-2xl"
-              />
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="absolute right-2 top-2 bottom-2 px-6 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-700 text-white rounded-xl font-bold flex items-center gap-2 transition-all"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <>
-                    <Search className="w-5 h-5" />
-                    <span>Search</span>
-                  </>
-                )}
-              </button>
+          {isLoading && (
+            <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none z-10">
+              <Loader2 className="h-6 w-6 text-emerald-500 animate-spin" />
             </div>
-            
-            {/* Mock Autocomplete Hint */}
-            <div className="mt-4 flex flex-wrap justify-center gap-2">
-              <span className="text-xs text-gray-500 uppercase font-bold tracking-widest">Popular:</span>
-              <button 
-                type="button"
-                onClick={() => setQuery('Austin, TX')}
-                className="text-xs text-gray-400 hover:text-emerald-500 transition-colors underline decoration-gray-700 underline-offset-4"
-              >
-                Austin, TX
-              </button>
-              <button 
-                type="button"
-                onClick={() => setQuery('Miami, FL')}
-                className="text-xs text-gray-400 hover:text-emerald-500 transition-colors underline decoration-gray-700 underline-offset-4"
-              >
-                Miami, FL
-              </button>
-            </div>
-          </form>
+          )}
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mt-6 text-red-400 bg-red-400/10 inline-block px-4 py-2 rounded-lg border border-red-400/20">
+            {error}
+          </div>
+        )}
+
+        {/* Property Results Card */}
+        {searchedProperty && !isLoading && (
+          <div className="mt-16 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-500">
+            <h3 className="text-left text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <MapPin className="text-emerald-500" /> Property Found
+            </h3>
+            
+            {/* Assuming PropertyCard accepts the property data and has an "Analyze ROI" button 
+               that triggers navigate('/dashboard') 
+            */}
+            <PropertyCard 
+              property={searchedProperty} 
+              onAnalyzeClick={() => navigate('/dashboard')} 
+            />
+          </div>
+        )}
+
       </div>
     </div>
   );
