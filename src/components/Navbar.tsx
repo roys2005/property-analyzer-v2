@@ -1,11 +1,9 @@
-// src/components/Navbar.tsx
 import React, { useState } from 'react';
 import { 
   User, LogOut, Settings, CreditCard, HelpCircle, 
-  LayoutDashboard, Menu, X, Facebook, Apple, Mail, Chrome, ArrowLeft, Loader2
+  LayoutDashboard, Menu, X, Facebook, Apple, Mail, Chrome, ArrowLeft, Loader2, FolderOpen
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { cn } from '../lib/utils';
 import { Link, useLocation } from 'react-router-dom';
 
 export const Navbar: React.FC = () => {
@@ -49,7 +47,6 @@ export const Navbar: React.FC = () => {
       }
       closeModal();
     } catch (error: any) {
-      // Clean up Firebase error messages for the user
       const msg = error.message.replace('Firebase: ', '').replace(/\(auth.*\)\.?/, '');
       setAuthError(msg);
     } finally {
@@ -64,12 +61,13 @@ export const Navbar: React.FC = () => {
       setEmail('');
       setPassword('');
       setAuthError('');
-    }, 300); // Reset after closing animation
+    }, 300); 
   };
 
   return (
     <>
-      <nav className="bg-[#0a0f1d] border-b border-gray-800 sticky top-0 z-50">
+      {/* Added print:hidden so the navbar doesn't show up on PDFs */}
+      <nav className="bg-[#0a0f1d] border-b border-gray-800 sticky top-0 z-50 print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             {/* Logo */}
@@ -111,9 +109,21 @@ export const Navbar: React.FC = () => {
                           {user.subscription === 'pro' ? 'Pro Plan' : `${user.analysesRemaining} Credits Left`}
                         </p>
                       </div>
-                      <Link to="/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800"><User className="w-4 h-4" /> Profile</Link>
-                      <Link to="/subscription" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800"><CreditCard className="w-4 h-4" /> Subscription</Link>
-                      <Link to="/settings" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800"><Settings className="w-4 h-4" /> Settings</Link>
+                      <Link to="/profile" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800">
+                        <User className="w-4 h-4" /> Profile
+                      </Link>
+                      
+                      {/* NEW SAVED DEALS LINK */}
+                      <Link to="/saved" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800">
+                        <FolderOpen className="w-4 h-4" /> Saved Deals
+                      </Link>
+                      
+                      <Link to="/subscription" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800">
+                        <CreditCard className="w-4 h-4" /> Subscription
+                      </Link>
+                      <Link to="/settings" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800">
+                        <Settings className="w-4 h-4" /> Settings
+                      </Link>
                       <button
                         onClick={() => { logout(); setIsProfileOpen(false); }}
                         className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-gray-800 text-left"
@@ -141,6 +151,40 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-[#0a0f1d] border-b border-gray-800 px-4 py-4 space-y-4">
+            {user ? (
+              <>
+                <div className="pb-4 border-b border-gray-800">
+                  <p className="text-white font-medium">{user.name}</p>
+                  <p className="text-gray-400 text-sm">{user.email}</p>
+                </div>
+                <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-300 hover:text-white text-lg font-medium">Profile</Link>
+                
+                {/* NEW SAVED DEALS LINK (MOBILE) */}
+                <Link to="/saved" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-300 hover:text-white text-lg font-medium">Saved Deals</Link>
+                
+                <Link to="/subscription" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-300 hover:text-white text-lg font-medium">Subscription</Link>
+                <Link to="/settings" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-300 hover:text-white text-lg font-medium">Settings</Link>
+                <div className="pt-4 border-t border-gray-800">
+                  <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="w-full text-left text-red-400 text-lg font-medium">Logout</button>
+                </div>
+              </>
+            ) : (
+              <button 
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsAuthModalOpen(true);
+                }}
+                className="w-full bg-emerald-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-emerald-500/20"
+              >
+                Sign In
+              </button>
+            )}
+          </div>
+        )}
       </nav>
 
       {/* Authentication Modal */}
@@ -176,7 +220,7 @@ export const Navbar: React.FC = () => {
                 </div>
               )}
 
-              {/* MAIN VIEW: Social + Email Select */}
+              {/* MAIN VIEW */}
               {authView === 'main' && (
                 <div className="space-y-3">
                   <button onClick={() => handleSocialLogin(loginWithGoogle)} className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-900 py-3.5 rounded-xl font-bold transition-colors">
@@ -201,7 +245,7 @@ export const Navbar: React.FC = () => {
                 </div>
               )}
 
-              {/* EMAIL VIEW: Login / Signup Form */}
+              {/* EMAIL VIEW */}
               {authView !== 'main' && (
                 <form onSubmit={handleEmailAuth} className="space-y-4">
                   <div>

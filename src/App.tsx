@@ -5,6 +5,7 @@ import { Navbar } from './components/Navbar';
 import { LandingPage } from './LandingPage';
 import { AnalysisDashboard } from './components/AnalysisDashboard';
 import { SubscriptionPage } from './components/SubscriptionPage';
+import { SavedDeals } from './components/SavedDeals';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/analyze" element={<AnalysisDashboard />} />
                 <Route path="/subscription" element={<SubscriptionPage />} />
+                <Route path="/saved" element={<SavedDeals />} />
                 {/* Fallback */}
                 <Route path="*" element={<LandingPage />} />
               </Routes>

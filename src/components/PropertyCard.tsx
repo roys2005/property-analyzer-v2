@@ -6,19 +6,29 @@ import { useNavigate } from 'react-router-dom';
 
 interface PropertyCardProps {
   property: Property;
+  onAnalyzeClick?: () => void;
 }
 
-export const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
-  const { setSelectedProperty, setFinancials } = useProperty();
+export const PropertyCard: React.FC<PropertyCardProps> = ({ property, onAnalyzeClick }) => {
+  const { setSelectedProperty, setFinancials, financials } = useProperty();
   const navigate = useNavigate();
 
   const handleAnalyze = () => {
+    // If a custom click handler is passed (like from SavedDeals), run that instead
+    if (onAnalyzeClick) {
+      return onAnalyzeClick();
+    }
+    
+    // Otherwise, fall back to the default logic
     setSelectedProperty(property);
-    setFinancials(prev => ({
-      ...prev,
+    
+    // Pass the merged object directly to fix the TypeScript 'prev' error
+    setFinancials({
+      ...financials,
       purchasePrice: property.price,
       monthlyRent: property.estimatedRent,
-    }));
+    });
+    
     navigate('/analyze');
   };
 

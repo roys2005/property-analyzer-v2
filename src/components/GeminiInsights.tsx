@@ -7,9 +7,11 @@ import { Financials, AnalysisResults } from '../types';
 interface GeminiInsightsProps {
   financials: Financials;
   results: AnalysisResults;
+  onInsightsGenerated?: (insights: string) => void; 
 }
 
-export const GeminiInsights: React.FC<GeminiInsightsProps> = ({ financials, results }) => {
+// 1. Add onInsightsGenerated to the destructured props here:
+export const GeminiInsights: React.FC<GeminiInsightsProps> = ({ financials, results, onInsightsGenerated }) => {
   const [insights, setInsights] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -18,12 +20,16 @@ export const GeminiInsights: React.FC<GeminiInsightsProps> = ({ financials, resu
     try {
       const summary = await getGeminiSummary(financials, results);
       setInsights(summary);
+      // 2. Now this will work because it's passed into the component
+      if (onInsightsGenerated) onInsightsGenerated(summary); 
     } catch (error) {
       setInsights("Unable to generate insights at this time.");
     } finally {
       setIsLoading(false);
     }
   };
+  
+  // ... rest of component
 
   return (
     <div className="bg-[#161b2b] border border-emerald-500/30 rounded-2xl p-6 shadow-lg relative overflow-hidden group">
