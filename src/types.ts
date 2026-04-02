@@ -1,3 +1,16 @@
+// src/types.ts
+
+export interface Comparable {
+  id: string;
+  address: string;
+  price: number;
+  distance: number;
+  beds: number;
+  baths: number;
+  sqft: number;
+  propertyType: string;
+}
+
 export interface Property {
   id: string;
   address: string;
@@ -5,14 +18,27 @@ export interface Property {
   state: string;
   zipCode: string;
   price: number;
+  estimatedRent: number;
   beds: number;
   baths: number;
   sqft: number;
   yearBuilt: number;
   propertyType: string;
   imageUrl: string;
-  estimatedRent: number;
   estimatedYield: number;
+  
+  // New AVM & Comps Fields
+  rentRangeLow?: number;
+  rentRangeHigh?: number;
+  comparables?: Comparable[];
+}
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  subscription: 'free' | 'pro';
+  analysesRemaining: number;
 }
 
 export interface Financials {
@@ -35,12 +61,4 @@ export interface AnalysisResults {
   capRate: number;
   cashOnCashROI: number;
   totalInvestment: number;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  subscription: 'free' | 'pro';
-  analysesRemaining: number;
 }

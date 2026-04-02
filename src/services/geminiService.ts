@@ -1,12 +1,22 @@
 import { GoogleGenAI } from "@google/genai";
 import { Financials, AnalysisResults } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+// 1. Use import.meta.env and the VITE_ prefix
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+// Initialize SDK only if key exists
+const ai = apiKey ? new GoogleGenAI({ apiKey: apiKey }) : null;
 
 export const getGeminiSummary = async (financials: Financials, results: AnalysisResults): Promise<string> => {
+  if (!ai) {
+    console.error("Gemini API key is missing. Check your .env file.");
+    return "API Key is missing. Please configure VITE_GEMINI_API_KEY in your .env file.";
+  }
+
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      // 2. Use a currently supported model name
+      model: "gemini-2.5-flash", 
       contents: `
         Analyze this real estate deal:
         Purchase Price: $${financials.purchasePrice}
@@ -18,9 +28,11 @@ export const getGeminiSummary = async (financials: Financials, results: Analysis
         Provide a concise, professional summary of the deal potential, risks, and a recommendation.
       `,
     });
+    
     return response.text || "Unable to generate insights at this time.";
-  } catch (error) {
-    console.error("Gemini Error:", error);
+  } catch (error: any) {
+    // 3. Log the actual error to the console so you can see if it's a quota/model issue
+    console.error("Gemini Error Details:", error);
     return "AI insights are currently unavailable. Please check your financial parameters manually.";
   }
 };
