@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { PropertyProvider } from './context/PropertyContext';
 import { Navbar } from './components/Navbar';
@@ -7,6 +7,9 @@ import { AnalysisDashboard } from './components/AnalysisDashboard';
 import { SubscriptionPage } from './components/SubscriptionPage';
 import { SavedDeals } from './components/SavedDeals';
 import { Profile } from './components/Profile';
+import { Contact } from './components/Contact';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { TermsOfService } from './components/TermsOfService';
 
 export default function App() {
   return (
@@ -20,30 +23,32 @@ export default function App() {
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/analyze" element={<AnalysisDashboard />} />
                 <Route path="/saved" element={<SavedDeals />} />
-                
-                {/* The new unified Profile page replaces Subscription & Settings */}
                 <Route path="/profile" element={<Profile />} />
+                
+                {/* Standard Legal & Contact Pages */}
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<TermsOfService />} />
                 
                 {/* Fallback */}
                 <Route path="*" element={<LandingPage />} />
               </Routes>
             </main>
             
-            <footer className="bg-[#0a0f1d] border-t border-gray-800 py-12">
+            <footer className="bg-white border-t border-gray-200 py-12 print:hidden">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <div className="w-6 h-6 bg-emerald-500 rounded flex items-center justify-center">
-                    <span className="text-white text-[10px] font-bold">P</span>
-                  </div>
-                  <span className="text-lg font-bold text-white tracking-tight">Property Analyzer</span>
+                  {/* Using your new logo image here instead of the 'P' icon */}
+                  <img src="/logo.svg" alt="Property Analyzer Logo" className="w-6 h-6 object-contain" />
+                  <span className="text-lg font-bold text-gray-900 tracking-tight">Property Analyzer</span>
                 </div>
                 <p className="text-gray-500 text-sm">
                   &copy; {new Date().getFullYear()} Property Analyzer Platform. All rights reserved.
                 </p>
-                <div className="mt-4 flex justify-center gap-6 text-xs font-bold text-gray-600 uppercase tracking-widest">
-                  <a href="#" className="hover:text-emerald-500 transition-colors">Privacy</a>
-                  <a href="#" className="hover:text-emerald-500 transition-colors">Terms</a>
-                  <a href="#" className="hover:text-emerald-500 transition-colors">Contact</a>
+                <div className="mt-4 flex justify-center gap-6 text-xs font-bold text-gray-500 uppercase tracking-widest">
+                  <Link to="/privacy" className="hover:text-emerald-600 transition-colors">Privacy</Link>
+                  <Link to="/terms" className="hover:text-emerald-600 transition-colors">Terms</Link>
+                  <Link to="/contact" className="hover:text-emerald-600 transition-colors">Contact</Link>
                 </div>
               </div>
             </footer>

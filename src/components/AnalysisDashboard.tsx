@@ -27,19 +27,17 @@ export const AnalysisDashboard: React.FC = () => {
 
   const results = calculateROI();
 
-  // --- New Calculations for the Extra KPI Cards ---
   const annualNOI = (financials.monthlyRent * 12) - financials.annualTaxes - financials.annualInsurance - (financials.monthlyHOA * 12) - ((financials.monthlyRent * financials.maintenancePercent / 100) * 12) - ((financials.monthlyRent * financials.vacancyPercent / 100) * 12);
   const grossYield = financials.purchasePrice > 0 ? ((financials.monthlyRent * 12) / financials.purchasePrice) * 100 : 0;
 
-  // --- Expense Breakdown Data for the Pie Chart ---
   const expensesData = [
-    { name: 'Mortgage', value: results.monthlyMortgage, color: '#10B981' }, // Emerald
-    { name: 'Taxes', value: financials.annualTaxes / 12, color: '#3B82F6' }, // Blue
-    { name: 'Insurance', value: financials.annualInsurance / 12, color: '#8B5CF6' }, // Purple
-    { name: 'HOA', value: financials.monthlyHOA, color: '#F59E0B' }, // Amber
-    { name: 'Maintenance', value: financials.monthlyRent * (financials.maintenancePercent / 100), color: '#EF4444' }, // Red
-    { name: 'Vacancy', value: financials.monthlyRent * (financials.vacancyPercent / 100), color: '#6B7280' }, // Gray
-  ].filter(item => item.value > 0); // Only show expenses that are greater than $0
+    { name: 'Mortgage', value: results.monthlyMortgage, color: '#10B981' }, 
+    { name: 'Taxes', value: financials.annualTaxes / 12, color: '#3B82F6' }, 
+    { name: 'Insurance', value: financials.annualInsurance / 12, color: '#8B5CF6' }, 
+    { name: 'HOA', value: financials.monthlyHOA, color: '#F59E0B' }, 
+    { name: 'Maintenance', value: financials.monthlyRent * (financials.maintenancePercent / 100), color: '#EF4444' }, 
+    { name: 'Vacancy', value: financials.monthlyRent * (financials.vacancyPercent / 100), color: '#6B7280' }, 
+  ].filter(item => item.value > 0); 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -88,13 +86,13 @@ export const AnalysisDashboard: React.FC = () => {
     }
   };
 
-  // Custom Tooltip for the Pie Chart to match Dark Mode
+  // Fixed Tooltip for light theme
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-[#0a0f1d] border border-gray-800 p-3 rounded-xl shadow-2xl print:bg-white print:border-gray-200">
-          <p className="text-gray-300 text-sm mb-1 print:text-gray-600">{payload[0].name}</p>
-          <p className="text-white font-bold text-lg print:text-black">${payload[0].value.toFixed(2)}</p>
+        <div className="bg-white border border-gray-200 p-3 rounded-xl shadow-lg">
+          <p className="text-gray-500 text-sm mb-1">{payload[0].name}</p>
+          <p className="text-gray-900 font-bold text-lg">${payload[0].value.toFixed(2)}</p>
         </div>
       );
     }
@@ -104,32 +102,32 @@ export const AnalysisDashboard: React.FC = () => {
   if (!property) return null;
 
   return (
-    <div className="min-h-screen bg-[#0a0f1d] text-white pb-12 print:bg-white print:text-black">
+    <div className="min-h-screen bg-gray-50 text-gray-900 pb-12 print:bg-white print:text-black">
       
       {/* Action Toolbar */}
-      <div className="bg-[#161b2b] border-b border-gray-800 sticky top-16 z-40 print:hidden">
+      <div className="bg-white border-b border-gray-200 sticky top-16 z-40 print:hidden shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <button onClick={() => navigate(-1)} className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-full transition-colors">
+            <button onClick={() => navigate(-1)} className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-lg font-bold">{property.address}</h1>
-              <p className="text-sm text-gray-400">{property.city}, {property.state}</p>
+              <h1 className="text-lg font-bold text-gray-900">{property.address}</h1>
+              <p className="text-sm text-gray-500">{property.city}, {property.state}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <button onClick={() => window.print()} className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
+            <button onClick={() => window.print()} className="flex items-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm">
               <Printer className="w-4 h-4" /> Print
             </button>
-            <button onClick={handleShare} className="flex items-center gap-2 bg-[#1877F2] hover:bg-[#1877F2]/90 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
+            <button onClick={handleShare} className="flex items-center gap-2 bg-[#1877F2] hover:bg-[#1877F2]/90 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm">
               <Share2 className="w-4 h-4" /> Share
             </button>
             <button 
               onClick={handleSaveDeal}
               disabled={isSaving || isSaved}
-              className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-lg shadow-emerald-500/20"
+              className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-md shadow-emerald-500/20"
             >
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : isSaved ? <Check className="w-4 h-4" /> : <Save className="w-4 h-4" />}
               {isSaving ? 'Saving...' : isSaved ? 'Saved!' : 'Save Deal'}
@@ -139,19 +137,16 @@ export const AnalysisDashboard: React.FC = () => {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-        
-        {/* Print Only Header */}
         <div className="hidden print:block mb-8 border-b pb-4">
           <h1 className="text-3xl font-bold">{property.address}</h1>
           <p className="text-gray-600">Investment Analysis Report</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
           {/* LEFT: Financial Form */}
           <div className="lg:col-span-1 space-y-6 print:break-inside-avoid">
-            <div className="bg-[#161b2b] p-6 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200 print:shadow-none">
-              <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm print:shadow-none">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                 <Calculator className="w-5 h-5 text-emerald-500" /> Purchase Details
               </h2>
               
@@ -164,7 +159,7 @@ export const AnalysisDashboard: React.FC = () => {
                 <InputField label="Loan Term (Years)" name="loanTerm" value={financials.loanTerm} onChange={handleInputChange} />
               </div>
 
-              <h2 className="text-xl font-bold mb-6 mt-8 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 mt-8 flex items-center gap-2">
                 <DollarSign className="w-5 h-5 text-emerald-500" /> Income & Expenses
               </h2>
               
@@ -182,53 +177,53 @@ export const AnalysisDashboard: React.FC = () => {
           {/* RIGHT: Results, Charts & Insights */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* 6 KPI Cards (Expanded from 3) */}
+            {/* 6 KPI Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <div className="bg-[#161b2b] p-5 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
-                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 print:text-gray-600">Monthly Cash Flow</p>
-                <h3 className={`text-2xl font-bold ${results.monthlyCashFlow >= 0 ? 'text-emerald-500' : 'text-red-400'} print:text-black`}>
+              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Monthly Cash Flow</p>
+                <h3 className={`text-2xl font-bold ${results.monthlyCashFlow >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                   ${results.monthlyCashFlow.toFixed(2)}
                 </h3>
               </div>
-              <div className="bg-[#161b2b] p-5 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
-                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 print:text-gray-600">Cap Rate</p>
-                <h3 className="text-2xl font-bold text-white print:text-black">
+              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Cap Rate</p>
+                <h3 className="text-2xl font-bold text-gray-900">
                   {results.capRate.toFixed(2)}%
                 </h3>
               </div>
-              <div className="bg-[#161b2b] p-5 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
-                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 print:text-gray-600">Cash-on-Cash ROI</p>
-                <h3 className="text-2xl font-bold text-blue-400 print:text-black">
+              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Cash-on-Cash ROI</p>
+                <h3 className="text-2xl font-bold text-blue-600">
                   {results.cashOnCashROI.toFixed(2)}%
                 </h3>
               </div>
-              <div className="bg-[#161b2b] p-5 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
-                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 print:text-gray-600">Net Operating Income</p>
-                <h3 className="text-2xl font-bold text-white print:text-black">
+              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Net Operating Income</p>
+                <h3 className="text-2xl font-bold text-gray-900">
                   ${annualNOI.toFixed(2)}
                 </h3>
               </div>
-              <div className="bg-[#161b2b] p-5 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
-                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 print:text-gray-600">Total Investment</p>
-                <h3 className="text-2xl font-bold text-white print:text-black">
+              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Total Investment</p>
+                <h3 className="text-2xl font-bold text-gray-900">
                   ${results.totalInvestment.toLocaleString()}
                 </h3>
               </div>
-              <div className="bg-[#161b2b] p-5 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
-                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 print:text-gray-600">Gross Yield</p>
-                <h3 className="text-2xl font-bold text-purple-400 print:text-black">
+              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Gross Yield</p>
+                <h3 className="text-2xl font-bold text-purple-600">
                   {grossYield.toFixed(2)}%
                 </h3>
               </div>
             </div>
 
             {/* Expense Breakdown Chart */}
-            <div className="bg-[#161b2b] p-6 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200 print:break-inside-avoid">
+            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm print:break-inside-avoid">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold flex items-center gap-2">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                   <PieChartIcon className="w-5 h-5 text-emerald-500" /> Expense Breakdown
                 </h2>
-                <span className="text-2xl font-bold text-red-400">
+                <span className="text-2xl font-bold text-red-500">
                   ${results.monthlyExpenses.toFixed(2)}<span className="text-sm text-gray-500 font-normal"> /mo</span>
                 </span>
               </div>
@@ -236,16 +231,7 @@ export const AnalysisDashboard: React.FC = () => {
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie
-                      data={expensesData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={90}
-                      paddingAngle={5}
-                      dataKey="value"
-                      stroke="none"
-                    >
+                    <Pie data={expensesData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={5} dataKey="value" stroke="none">
                       {expensesData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
@@ -255,7 +241,7 @@ export const AnalysisDashboard: React.FC = () => {
                       verticalAlign="bottom" 
                       height={36} 
                       iconType="circle"
-                      formatter={(value, entry: any) => <span className="text-gray-300 text-sm print:text-gray-700">{value}</span>}
+                      formatter={(value) => <span className="text-gray-600 text-sm font-medium">{value}</span>}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -278,10 +264,9 @@ export const AnalysisDashboard: React.FC = () => {
   );
 };
 
-// Reusable Input Component
 const InputField = ({ label, name, value, symbol, onChange }: any) => (
   <div>
-    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 print:text-gray-700">{label}</label>
+    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{label}</label>
     <div className="relative">
       {symbol && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{symbol}</span>}
       <input 
@@ -289,7 +274,7 @@ const InputField = ({ label, name, value, symbol, onChange }: any) => (
         name={name}
         value={value}
         onChange={onChange}
-        className={`w-full bg-[#0a0f1d] border border-gray-800 rounded-xl py-2.5 ${symbol ? 'pl-8' : 'pl-4'} pr-4 text-white focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all print:bg-gray-50 print:text-black print:border-gray-300`}
+        className={`w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 ${symbol ? 'pl-8' : 'pl-4'} pr-4 text-gray-900 focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all shadow-sm`}
       />
     </div>
   </div>

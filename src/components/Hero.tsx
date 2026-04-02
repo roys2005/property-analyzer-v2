@@ -37,8 +37,8 @@ export const Hero: React.FC<HeroProps> = ({ onResults }) => {
         city: 'City Data Missing', 
         state: '',
         zipCode: '',
-        price: 0,          // User will manually input this on the dashboard
-        estimatedRent: 0,  // User will manually input this on the dashboard
+        price: 0,          
+        estimatedRent: 0,  
         beds: 0,
         baths: 0,
         sqft: 0,
@@ -58,7 +58,7 @@ export const Hero: React.FC<HeroProps> = ({ onResults }) => {
   };
 
   return (
-    <div className="relative bg-[#0a0f1d] pt-20 pb-32 overflow-hidden">
+    <div className="relative bg-white pt-20 pb-32 overflow-hidden border-b border-gray-100">
       {/* Background Decor */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[120px] rounded-full" />
@@ -67,18 +67,18 @@ export const Hero: React.FC<HeroProps> = ({ onResults }) => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto">
-          <h1 className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight mb-6">
+          <h1 className="text-4xl sm:text-6xl font-extrabold text-gray-900 tracking-tight mb-6">
             Analyze Real Estate Deals <br />
             <span className="text-emerald-500">Like a Pro</span>
           </h1>
-          <p className="text-xl text-gray-400 mb-10">
+          <p className="text-xl text-gray-500 mb-10">
             Instantly fetch market data, calculate ROI, and get AI-powered insights for any property in seconds.
           </p>
 
           <div className="relative max-w-2xl mx-auto">
             <div className="relative group">
               <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none z-10">
-                <MapPin className="h-5 w-5 text-gray-500 group-focus-within:text-emerald-500 transition-colors" />
+                <MapPin className="h-5 w-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
               </div>
               
               <Autocomplete
@@ -89,7 +89,7 @@ export const Hero: React.FC<HeroProps> = ({ onResults }) => {
                   componentRestrictions: { country: 'us' },
                 }}
                 placeholder="Enter address, city, or zip code..."
-                className="block w-full pl-14 pr-14 py-5 bg-[#161b2b] border border-gray-800 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all shadow-2xl"
+                className="block w-full pl-14 pr-14 py-5 bg-white border border-gray-200 rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all shadow-xl"
               />
 
               {isLoading ? (
@@ -98,16 +98,16 @@ export const Hero: React.FC<HeroProps> = ({ onResults }) => {
                 </div>
               ) : (
                 <div className="absolute right-5 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
-                  <Search className="w-5 h-5 text-gray-500" />
+                  <Search className="w-5 h-5 text-gray-400" />
                 </div>
               )}
             </div>
 
             {/* Graceful Warning Display */}
             {error && (
-              <div className="mt-4 flex items-center justify-center gap-2 text-amber-400 bg-amber-500/10 py-2 px-4 rounded-xl border border-amber-500/20">
+              <div className="mt-4 flex items-center justify-center gap-2 text-amber-600 bg-amber-50 py-2 px-4 rounded-xl border border-amber-200">
                 <AlertCircle className="w-4 h-4" />
-                <span className="text-sm">{error}</span>
+                <span className="text-sm font-medium">{error}</span>
               </div>
             )}
             

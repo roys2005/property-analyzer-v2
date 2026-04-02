@@ -27,6 +27,10 @@ export interface Property {
   imageUrl: string;
   estimatedYield: number;
   
+  // Fields for Property Details / Trending
+  lotSize?: number;
+  description?: string;
+  
   // New AVM & Comps Fields
   rentRangeLow?: number;
   rentRangeHigh?: number;
