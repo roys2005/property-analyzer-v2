@@ -2,19 +2,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Save, Check, Loader2, Calculator, TrendingUp, DollarSign, 
-  ArrowLeft, Share2, Printer
+  Save, Check, Loader2, Calculator, DollarSign, 
+  ArrowLeft, Share2, Printer, PieChart as PieChartIcon
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useProperty } from '../context/PropertyContext'; 
 import { saveDealToFirestore } from '../services/dbService';
 import { GeminiInsights } from './GeminiInsights';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 export const AnalysisDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   
-  // Use 'selectedProperty' from context, aliased to 'property' for convenience
   const { selectedProperty: property, financials, setFinancials, calculateROI } = useProperty();
   
   const [aiInsights, setAiInsights] = useState<string>('');
@@ -25,12 +25,24 @@ export const AnalysisDashboard: React.FC = () => {
     if (!property) navigate('/');
   }, [property, navigate]);
 
-  // Calculate results on the fly using the context function
   const results = calculateROI();
+
+  // --- New Calculations for the Extra KPI Cards ---
+  const annualNOI = (financials.monthlyRent * 12) - financials.annualTaxes - financials.annualInsurance - (financials.monthlyHOA * 12) - ((financials.monthlyRent * financials.maintenancePercent / 100) * 12) - ((financials.monthlyRent * financials.vacancyPercent / 100) * 12);
+  const grossYield = financials.purchasePrice > 0 ? ((financials.monthlyRent * 12) / financials.purchasePrice) * 100 : 0;
+
+  // --- Expense Breakdown Data for the Pie Chart ---
+  const expensesData = [
+    { name: 'Mortgage', value: results.monthlyMortgage, color: '#10B981' }, // Emerald
+    { name: 'Taxes', value: financials.annualTaxes / 12, color: '#3B82F6' }, // Blue
+    { name: 'Insurance', value: financials.annualInsurance / 12, color: '#8B5CF6' }, // Purple
+    { name: 'HOA', value: financials.monthlyHOA, color: '#F59E0B' }, // Amber
+    { name: 'Maintenance', value: financials.monthlyRent * (financials.maintenancePercent / 100), color: '#EF4444' }, // Red
+    { name: 'Vacancy', value: financials.monthlyRent * (financials.vacancyPercent / 100), color: '#6B7280' }, // Gray
+  ].filter(item => item.value > 0); // Only show expenses that are greater than $0
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    // Direct pass to context setFinancials, ensuring keys match types.ts
     setFinancials({
       ...financials,
       [name]: parseFloat(value) || 0
@@ -74,6 +86,19 @@ export const AnalysisDashboard: React.FC = () => {
       navigator.clipboard.writeText(window.location.href);
       alert('Link copied to clipboard!');
     }
+  };
+
+  // Custom Tooltip for the Pie Chart to match Dark Mode
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-[#0a0f1d] border border-gray-800 p-3 rounded-xl shadow-2xl print:bg-white print:border-gray-200">
+          <p className="text-gray-300 text-sm mb-1 print:text-gray-600">{payload[0].name}</p>
+          <p className="text-white font-bold text-lg print:text-black">${payload[0].value.toFixed(2)}</p>
+        </div>
+      );
+    }
+    return null;
   };
 
   if (!property) return null;
@@ -136,7 +161,6 @@ export const AnalysisDashboard: React.FC = () => {
                   <InputField label="Down Payment" name="downPaymentPercent" value={financials.downPaymentPercent} symbol="%" onChange={handleInputChange} />
                   <InputField label="Interest Rate" name="interestRate" value={financials.interestRate} symbol="%" onChange={handleInputChange} />
                 </div>
-                {/* Updated name to loanTerm */}
                 <InputField label="Loan Term (Years)" name="loanTerm" value={financials.loanTerm} onChange={handleInputChange} />
               </div>
 
@@ -146,7 +170,6 @@ export const AnalysisDashboard: React.FC = () => {
               
               <div className="space-y-4">
                 <InputField label="Monthly Rent" name="monthlyRent" value={financials.monthlyRent} symbol="$" onChange={handleInputChange} />
-                {/* Updated names to match types.ts */}
                 <InputField label="Annual Taxes" name="annualTaxes" value={financials.annualTaxes} symbol="$" onChange={handleInputChange} />
                 <InputField label="Annual Insurance" name="annualInsurance" value={financials.annualInsurance} symbol="$" onChange={handleInputChange} />
                 <InputField label="Monthly HOA" name="monthlyHOA" value={financials.monthlyHOA} symbol="$" onChange={handleInputChange} />
@@ -156,28 +179,86 @@ export const AnalysisDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* RIGHT: Results & Insights */}
+          {/* RIGHT: Results, Charts & Insights */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-[#161b2b] p-6 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
-                <p className="text-gray-400 text-sm font-medium mb-2 print:text-gray-600">Monthly Cash Flow</p>
-                <h3 className={`text-3xl font-bold ${results.monthlyCashFlow >= 0 ? 'text-emerald-500' : 'text-red-400'} print:text-black`}>
+            {/* 6 KPI Cards (Expanded from 3) */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div className="bg-[#161b2b] p-5 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
+                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 print:text-gray-600">Monthly Cash Flow</p>
+                <h3 className={`text-2xl font-bold ${results.monthlyCashFlow >= 0 ? 'text-emerald-500' : 'text-red-400'} print:text-black`}>
                   ${results.monthlyCashFlow.toFixed(2)}
                 </h3>
               </div>
-              <div className="bg-[#161b2b] p-6 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
-                <p className="text-gray-400 text-sm font-medium mb-2 print:text-gray-600">Cap Rate</p>
-                <h3 className="text-3xl font-bold text-white print:text-black">
+              <div className="bg-[#161b2b] p-5 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
+                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 print:text-gray-600">Cap Rate</p>
+                <h3 className="text-2xl font-bold text-white print:text-black">
                   {results.capRate.toFixed(2)}%
                 </h3>
               </div>
-              <div className="bg-[#161b2b] p-6 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
-                <p className="text-gray-400 text-sm font-medium mb-2 print:text-gray-600">Cash-on-Cash ROI</p>
-                <h3 className="text-3xl font-bold text-blue-400 print:text-black">
+              <div className="bg-[#161b2b] p-5 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
+                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 print:text-gray-600">Cash-on-Cash ROI</p>
+                <h3 className="text-2xl font-bold text-blue-400 print:text-black">
                   {results.cashOnCashROI.toFixed(2)}%
                 </h3>
+              </div>
+              <div className="bg-[#161b2b] p-5 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
+                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 print:text-gray-600">Net Operating Income</p>
+                <h3 className="text-2xl font-bold text-white print:text-black">
+                  ${annualNOI.toFixed(2)}
+                </h3>
+              </div>
+              <div className="bg-[#161b2b] p-5 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
+                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 print:text-gray-600">Total Investment</p>
+                <h3 className="text-2xl font-bold text-white print:text-black">
+                  ${results.totalInvestment.toLocaleString()}
+                </h3>
+              </div>
+              <div className="bg-[#161b2b] p-5 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200">
+                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 print:text-gray-600">Gross Yield</p>
+                <h3 className="text-2xl font-bold text-purple-400 print:text-black">
+                  {grossYield.toFixed(2)}%
+                </h3>
+              </div>
+            </div>
+
+            {/* Expense Breakdown Chart */}
+            <div className="bg-[#161b2b] p-6 rounded-2xl border border-gray-800 shadow-xl print:bg-white print:border-gray-200 print:break-inside-avoid">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                  <PieChartIcon className="w-5 h-5 text-emerald-500" /> Expense Breakdown
+                </h2>
+                <span className="text-2xl font-bold text-red-400">
+                  ${results.monthlyExpenses.toFixed(2)}<span className="text-sm text-gray-500 font-normal"> /mo</span>
+                </span>
+              </div>
+              
+              <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={expensesData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={5}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {expensesData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={36} 
+                      iconType="circle"
+                      formatter={(value, entry: any) => <span className="text-gray-300 text-sm print:text-gray-700">{value}</span>}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
             </div>
 

@@ -14,9 +14,13 @@ export interface SavedDeal {
 
 export const saveDealToFirestore = async (dealData: Omit<SavedDeal, 'id' | 'createdAt'>) => {
   try {
+    // FIX: Firestore rejects 'undefined' values. 
+    // This trick cleanly strips all 'undefined' fields out of the object before saving.
+    const sanitizedData = JSON.parse(JSON.stringify(dealData));
+
     const docRef = await addDoc(collection(db, "savedDeals"), {
-      ...dealData,
-      createdAt: Timestamp.now()
+      ...sanitizedData,
+      createdAt: Timestamp.now() // Timestamp is added AFTER sanitizing, so it stays a valid Date object
     });
     return docRef.id;
   } catch (error) {
