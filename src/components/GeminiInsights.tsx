@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { getGeminiSummary } from '../services/geminiService';
 import { Financials, AnalysisResults } from '../types';
 
@@ -52,8 +53,21 @@ export const GeminiInsights: React.FC<GeminiInsightsProps> = ({ financials, resu
             <p className="text-sm">Analyzing deal potential...</p>
           </div>
         ) : insights ? (
-          <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
-            {insights}
+          <div className="text-gray-300 text-sm leading-relaxed">
+            {/* Render Markdown with custom Tailwind styles */}
+            <ReactMarkdown 
+              components={{
+                strong: ({node, ...props}) => <span className="font-bold text-white" {...props} />,
+                p: ({node, ...props}) => <p className="mb-3" {...props} />,
+                ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-3 space-y-1" {...props} />,
+                ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-3 space-y-1" {...props} />,
+                li: ({node, ...props}) => <li className="text-gray-300" {...props} />,
+                h3: ({node, ...props}) => <h3 className="text-md font-bold text-emerald-400 mb-2 mt-4" {...props} />,
+                h4: ({node, ...props}) => <h4 className="text-sm font-bold text-emerald-500 mb-2 mt-3" {...props} />
+              }}
+            >
+              {insights}
+            </ReactMarkdown>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-8 text-gray-500 border-2 border-dashed border-gray-800 rounded-xl">
