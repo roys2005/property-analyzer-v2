@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { 
-  User, LogOut, Settings, CreditCard, HelpCircle, 
-  LayoutDashboard, Menu, X, Facebook, Apple, Mail, Chrome, ArrowLeft, Loader2, FolderOpen
+  User, LogOut, LayoutDashboard, Menu, X, 
+  Facebook, Apple, Mail, Chrome, ArrowLeft, 
+  Loader2, FolderOpen
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export const Navbar: React.FC = () => {
   const { 
@@ -66,7 +67,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* Added print:hidden so the navbar doesn't show up on PDFs */}
+      {/* print:hidden ensures the navbar doesn't show up on PDFs */}
       <nav className="bg-[#0a0f1d] border-b border-gray-800 sticky top-0 z-50 print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
@@ -109,21 +110,16 @@ export const Navbar: React.FC = () => {
                           {user.subscription === 'pro' ? 'Pro Plan' : `${user.analysesRemaining} Credits Left`}
                         </p>
                       </div>
+                      
+                      {/* UPDATED LINKS */}
                       <Link to="/profile" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800">
-                        <User className="w-4 h-4" /> Profile
+                        <User className="w-4 h-4" /> Account Settings
                       </Link>
                       
-                      {/* NEW SAVED DEALS LINK */}
                       <Link to="/saved" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800">
                         <FolderOpen className="w-4 h-4" /> Saved Deals
                       </Link>
                       
-                      <Link to="/subscription" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800">
-                        <CreditCard className="w-4 h-4" /> Subscription
-                      </Link>
-                      <Link to="/settings" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800">
-                        <Settings className="w-4 h-4" /> Settings
-                      </Link>
                       <button
                         onClick={() => { logout(); setIsProfileOpen(false); }}
                         className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-gray-800 text-left"
@@ -161,13 +157,11 @@ export const Navbar: React.FC = () => {
                   <p className="text-white font-medium">{user.name}</p>
                   <p className="text-gray-400 text-sm">{user.email}</p>
                 </div>
-                <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-300 hover:text-white text-lg font-medium">Profile</Link>
                 
-                {/* NEW SAVED DEALS LINK (MOBILE) */}
+                {/* UPDATED MOBILE LINKS */}
+                <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-300 hover:text-white text-lg font-medium">Account Settings</Link>
                 <Link to="/saved" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-300 hover:text-white text-lg font-medium">Saved Deals</Link>
                 
-                <Link to="/subscription" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-300 hover:text-white text-lg font-medium">Subscription</Link>
-                <Link to="/settings" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-300 hover:text-white text-lg font-medium">Settings</Link>
                 <div className="pt-4 border-t border-gray-800">
                   <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="w-full text-left text-red-400 text-lg font-medium">Logout</button>
                 </div>

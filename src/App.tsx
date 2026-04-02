@@ -6,6 +6,7 @@ import { LandingPage } from './LandingPage';
 import { AnalysisDashboard } from './components/AnalysisDashboard';
 import { SubscriptionPage } from './components/SubscriptionPage';
 import { SavedDeals } from './components/SavedDeals';
+import { Profile } from './components/Profile';
 
 export default function App() {
   return (
@@ -18,8 +19,11 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/analyze" element={<AnalysisDashboard />} />
-                <Route path="/subscription" element={<SubscriptionPage />} />
                 <Route path="/saved" element={<SavedDeals />} />
+                
+                {/* The new unified Profile page replaces Subscription & Settings */}
+                <Route path="/profile" element={<Profile />} />
+                
                 {/* Fallback */}
                 <Route path="*" element={<LandingPage />} />
               </Routes>
