@@ -19,7 +19,6 @@ Property Analyzer is a modern, full-stack real estate investment platform built 
 * **Payments:** Stripe (via Firebase "Run Payments with Stripe" Extension)
 * **APIs:** Google Maps Places API, RentCast API, Google Gemini AI API
 
----
 
 ## 🚀 Local Development Setup
 
@@ -83,7 +82,6 @@ npm run dev
 ```
 The app will now be running at `http://localhost:5173`.
 
----
 
 ## 🌐 Deploying to Netlify
 
@@ -121,8 +119,6 @@ You must add every variable from your local `.env` file here:
 ### Step 5: Deploy
 Click **Deploy site**. Netlify will build your project and provide you with a live, secure HTTPS URL.
 
----
 
 ## 📄 License
-This project is for educational and personal use. 
-```
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
